@@ -1,11 +1,15 @@
 package mime
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestParseSubjectFromRawMessage(t *testing.T)  {
-	raw := "000"
+func TestParseShouldReturnErrorOnInvalidRawMessages(t *testing.T) {
+	raw := "invalid message"
 
-	m := Parse([]byte(raw))
+	_, err := Parse([]byte(raw))
 
-	t.Error(m.Subject)
+	if err == nil {
+		t.Errorf("Invalid messages should result in error!")
+	}
 }

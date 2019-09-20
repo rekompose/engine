@@ -1,6 +1,7 @@
 package mime
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -20,6 +21,17 @@ func TestParseBase64ShouldReturnErrorOnInvalidEncoding(t *testing.T) {
 	_, err := ParseBase64(raw)
 
 	if err == nil {
+		t.Errorf("Invalid encoding should result in error!")
+	}
+}
+
+func TestParseBase64ShouldReturnMessageWhenValidEncodingGiven(t *testing.T) {
+	raw := "TUlNRS1WZXJzaW9uCg==" // "MIME-Version" in base64
+
+	result, _ := ParseBase64(raw)
+	resultType := fmt.Sprintf("%T", result)
+
+	if resultType != "types.Message" {
 		t.Errorf("Invalid encoding should result in error!")
 	}
 }

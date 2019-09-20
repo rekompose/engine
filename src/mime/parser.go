@@ -9,7 +9,7 @@ import (
 )
 
 // ParseBase64 will return the parsed mail from a raw message encoded in Base64
-func ParseBase64(message string) (*types.Message, error) {
+func ParseBase64(message string) (types.Message, error) {
 	message = addMissingPaddings(message)
 
 	raw, err := base64.StdEncoding.DecodeString(message)
@@ -17,18 +17,18 @@ func ParseBase64(message string) (*types.Message, error) {
 		return Parse(raw)
 	}
 
-	return nil, errors.New("Could not parse, potential encoding error")
+	return types.Message{}, errors.New("Could not parse, potential encoding error")
 }
 
 // Parse will return the parsed mail from a raw message
-func Parse(message []byte) (*types.Message, error) {
+func Parse(message []byte) (types.Message, error) {
 	match, _ := regexp.Match(`MIME\-Version`, message)
 
 	if !match {
-		return nil, errors.New("Could not parse the message")
+		return types.Message{}, errors.New("Could not parse the message")
 	}
 
-	return &types.Message{Subject: "N/A", HTML: false}, nil
+	return types.Message{Subject: "N/A", HTML: false}, nil
 }
 
 func addMissingPaddings(message string) string {

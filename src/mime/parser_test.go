@@ -56,7 +56,7 @@ func TestParseBase64ShouldReadFrom(t *testing.T) {
 
 	message, _ := ParseBase64(mail)
 
-	if message.From == "" {
+	if message.From.Address == "" {
 		t.Errorf("Should parse `From` from the mime!")
 	}
 }

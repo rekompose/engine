@@ -8,6 +8,7 @@ import (
 
 	"github.com/jhillyerd/enmime"
 	"rekompose.com/engine/types"
+	"rekompose.com/engine/utils"
 )
 
 // ParseBase64 will return the parsed mail from a raw message encoded in Base64
@@ -28,11 +29,13 @@ func Parse(raw []byte) (types.Message, error) {
 		return types.Message{}, errors.New("Could not parse the message")
 	}
 
+	matchedFrom, _ := utils.Extract(env.GetHeader("From"))
+
 	return types.Message{
 		MimeVersion: env.GetHeader("Mime-Version"),
 		MessageID:   env.GetHeader("Message-Id"),
 		Date:        env.GetHeader("Date"),
-		From:        env.GetHeader("From"),
+		From:        matchedFrom,
 		To:          extractEmailAddresses(env.GetHeader("To")),
 		Cc:          extractEmailAddresses(env.GetHeader("Cc")),
 		Bcc:         extractEmailAddresses(env.GetHeader("Bcc")),
@@ -52,9 +55,18 @@ func addMissingPaddings(raw string) string {
 }
 
 // extract email addresses from comma separated list
-func extractEmailAddresses(s string) []string {
-	var list []string
+func extractEmailAddresses(s string) []types.Email {
+	var list []types.Email
+	filter := func(c rune) bool {
+		return c == ','
+	}
 
-	list = strings.Split(s, ",")
+	for _, email := range strings.FieldsFunc(s, filter) {
+		match, err := utils.Extract(email)
+		if err == nil {
+			list = append(list, match)
+		}
+	}
+
 	return list
 }

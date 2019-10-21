@@ -47,7 +47,77 @@ func TestParseBase64ShouldReadSubject(t *testing.T) {
 	message, _ := ParseBase64(mail)
 
 	if message.Subject == "" {
-		t.Errorf("Should parse subject from the mime!")
+		t.Errorf("Should parse `Subject` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadFrom(t *testing.T) {
+	mail := loadRawMessage("./data/mail1.json")
+
+	message, _ := ParseBase64(mail)
+
+	if message.From == "" {
+		t.Errorf("Should parse `From` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadTo(t *testing.T) {
+	mail := loadRawMessage("./data/mail1.json")
+
+	message, _ := ParseBase64(mail)
+
+	if len(message.To) == 0 {
+		t.Errorf("Should parse `To` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadMultipleToAddresses(t *testing.T) {
+	mail := loadRawMessage("./data/mail2.json")
+
+	message, _ := ParseBase64(mail)
+
+	if len(message.To) < 2 {
+		t.Errorf("Should parse multiple `To` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadCc(t *testing.T) {
+	mail := loadRawMessage("./data/mail3.json")
+
+	message, _ := ParseBase64(mail)
+
+	if len(message.Cc) == 0 {
+		t.Errorf("Should parse `Cc` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadMultipleCcAddresses(t *testing.T) {
+	mail := loadRawMessage("./data/mail4.json")
+
+	message, _ := ParseBase64(mail)
+
+	if len(message.Cc) < 2 {
+		t.Errorf("Should parse multiple `Cc` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadDate(t *testing.T) {
+	mail := loadRawMessage("./data/mail1.json")
+
+	message, _ := ParseBase64(mail)
+
+	if message.Date == "" {
+		t.Errorf("Should parse `Date` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadText(t *testing.T) {
+	mail := loadRawMessage("./data/mail1.json")
+
+	message, _ := ParseBase64(mail)
+
+	if message.Text == "" {
+		t.Errorf("Should parse `Text` from the mime!")
 	}
 }
 

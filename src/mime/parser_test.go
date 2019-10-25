@@ -57,7 +57,17 @@ func TestParseBase64ShouldReadFrom(t *testing.T) {
 	message, _ := ParseBase64(mail)
 
 	if message.From.Address == "" {
-		t.Errorf("Should parse `From` from the mime!")
+		t.Errorf("Should parse `From` from the mime when sender and email address present!")
+	}
+}
+
+func TestParseBase64ShouldReadFromWhenOnlyEmailAddressPresent(t *testing.T) {
+	mail := loadRawMessage("./data/mail3.json")
+
+	message, _ := ParseBase64(mail)
+	t.Error(message)
+	if message.From.Address == "" {
+		t.Errorf("Should parse `From` from the mime when only email address present!")
 	}
 }
 

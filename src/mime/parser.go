@@ -11,6 +11,8 @@ import (
 	"rekompose.com/engine/utils"
 )
 
+var log = utils.NewLogger()
+
 // ParseBase64 will return the parsed mail from a raw message encoded in Base64
 func ParseBase64(raw string) (types.Message, error) {
 	b, err := base64.URLEncoding.DecodeString(addMissingPaddings(raw))
@@ -29,16 +31,14 @@ func Parse(raw []byte) (types.Message, error) {
 		return types.Message{}, errors.New("Could not parse the message")
 	}
 
-	matchedFrom, _ := utils.Extract(env.GetHeader("From"))
-
 	return types.Message{
 		MimeVersion: env.GetHeader("Mime-Version"),
 		MessageID:   env.GetHeader("Message-Id"),
 		Date:        env.GetHeader("Date"),
-		From:        matchedFrom,
-		To:          extractEmailAddresses(env.GetHeader("To")),
-		Cc:          extractEmailAddresses(env.GetHeader("Cc")),
-		Bcc:         extractEmailAddresses(env.GetHeader("Bcc")),
+		From:        extractSingleEmailAddress(env.GetHeader("From")),
+		To:          extractMultipleEmailAddresses(env.GetHeader("To")),
+		Cc:          extractMultipleEmailAddresses(env.GetHeader("Cc")),
+		Bcc:         extractMultipleEmailAddresses(env.GetHeader("Bcc")),
 		Subject:     env.GetHeader("Subject"),
 		Text:        env.Text,
 		HTML:        env.HTML,
@@ -49,13 +49,25 @@ func Parse(raw []byte) (types.Message, error) {
 func addMissingPaddings(raw string) string {
 	if m := len(raw) % 4; m != 0 {
 		raw += strings.Repeat("=", 4-m)
+		log.Debug("Adding missing padding for base64 raw string!")
 	}
 
 	return raw
 }
 
+// extract single email address from a string
+func extractSingleEmailAddress(s string) types.Email {
+	address, err := utils.Extract(s)
+	if err != nil {
+		log.Error("invalid email adress detected", "address", s)
+	}
+
+	return address
+}
+
 // extract email addresses from comma separated list
-func extractEmailAddresses(s string) []types.Email {
+func extractMultipleEmailAddresses(s string) []types.Email {
+	log.Debug("extraction of emails ", "incoming text", s)
 	var list []types.Email
 	filter := func(c rune) bool {
 		return c == ','
@@ -68,5 +80,6 @@ func extractEmailAddresses(s string) []types.Email {
 		}
 	}
 
+	log.Debug("extracted ", "emails", list)
 	return list
 }

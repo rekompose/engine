@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestExtractSenderFromString(t *testing.T) {
+func TestExtractSenderInformation(t *testing.T) {
 	name := "John Doe"
 	test := fmt.Sprintf("%s <john@doe.org>", name)
 
@@ -16,7 +16,7 @@ func TestExtractSenderFromString(t *testing.T) {
 	}
 }
 
-func TestExtractShouldRemoveQuotesFromString(t *testing.T) {
+func TestExtractShouldTrimQuotes(t *testing.T) {
 	before := "\"'John Doe\"'"
 	after := "John Doe"
 	test := fmt.Sprintf("%s <john@doe.org>", before)
@@ -24,11 +24,11 @@ func TestExtractShouldRemoveQuotesFromString(t *testing.T) {
 	result, _ := Extract(test)
 
 	if result.Sender != after {
-		t.Errorf("Should remove all the quotes from the sender information in the email string")
+		t.Errorf("Should trim all the quotes from the sender information in the email string")
 	}
 }
 
-func TestExtractEmailAddressFromString(t *testing.T) {
+func TestExtractEmailAddress(t *testing.T) {
 	emailAddress := "john@doe.org"
 	test := fmt.Sprintf("John Doe <%s>", emailAddress)
 
@@ -39,7 +39,7 @@ func TestExtractEmailAddressFromString(t *testing.T) {
 	}
 }
 
-func TestExtractShouldDisplayFullEmailAddressFromString(t *testing.T) {
+func TestExtractShouldDisplayFullEmailAddress(t *testing.T) {
 	address := "John Doe <john@doe.org>"
 	test := fmt.Sprintf(address)
 
@@ -50,7 +50,7 @@ func TestExtractShouldDisplayFullEmailAddressFromString(t *testing.T) {
 	}
 }
 
-func TestExtractShouldDisplayFullEmailAddressFromStringWhenMissingSenderInformation(t *testing.T) {
+func TestExtractShouldDisplayFullEmailAddressWhenMissingSenderInformation(t *testing.T) {
 	address := "<john@doe.org>"
 	test := fmt.Sprintf(address)
 
@@ -58,6 +58,27 @@ func TestExtractShouldDisplayFullEmailAddressFromStringWhenMissingSenderInformat
 
 	if result.Text() != address {
 		t.Errorf("Should display full email address from email string")
+	}
+}
+
+func TestExtractShouldDisplayFullEmailAddressWhenGibberishValidStringGiven(t *testing.T) {
+	address := "<CALnn9HgYRR6CN=v9+CSeH8hwZaJZ2pF+cbQR5=YnzdcEJTrpig@mail.gmail.com>"
+	test := fmt.Sprintf(address)
+
+	result, _ := Extract(test)
+
+	if result.Text() != address {
+		t.Errorf("Should display full email address from gibberish, but valid email string")
+	}
+}
+
+func TestExtractShouldDisplayFullEmailAddressWhenEmailStringWithoutAngleBracketsGiven(t *testing.T) {
+	address := "random@gmail.com"
+
+	result, _ := Extract(address)
+
+	if result.Address != address {
+		t.Errorf("Should display full email address from valid email string without angle brackets")
 	}
 }
 

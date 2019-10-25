@@ -8,5 +8,9 @@ require (
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/rakyll/gotest v0.0.0-20180125184505-86f0749cd8cc // indirect
+	github.com/sirupsen/logrus v1.4.2
+	go.uber.org/atomic v1.4.0 // indirect
+	go.uber.org/multierr v1.2.0 // indirect
+	go.uber.org/zap v1.11.0
 	golang.org/x/sys v0.0.0-20190919044723-0c1ff786ef13 // indirect
 )

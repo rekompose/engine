@@ -8,10 +8,11 @@ import (
 
 	"github.com/jhillyerd/enmime"
 	"rekompose.com/engine/types"
-	"rekompose.com/engine/utils"
+	"rekompose.com/engine/utils/logging"
+	"rekompose.com/engine/utils/messaging"
 )
 
-var log = utils.NewLogger()
+var log = logging.NewLogger()
 
 // ParseBase64 will return the parsed mail from a raw message encoded in Base64
 func ParseBase64(raw string) (types.Message, error) {
@@ -31,6 +32,8 @@ func Parse(raw []byte) (types.Message, error) {
 		return types.Message{}, errors.New("Could not parse the message")
 	}
 
+	attachments := extractAttachments(env.Attachments)
+
 	return types.Message{
 		MimeVersion: env.GetHeader("Mime-Version"),
 		MessageID:   env.GetHeader("Message-Id"),
@@ -42,6 +45,7 @@ func Parse(raw []byte) (types.Message, error) {
 		Subject:     env.GetHeader("Subject"),
 		Text:        env.Text,
 		HTML:        env.HTML,
+		Attachments: attachments,
 	}, nil
 }
 
@@ -57,7 +61,7 @@ func addMissingPaddings(raw string) string {
 
 // extract single email address from a string
 func extractSingleEmailAddress(s string) types.Email {
-	address, err := utils.Extract(s)
+	address, err := messaging.Extract(s)
 	if err != nil {
 		log.Error("invalid email adress detected", "address", s)
 	}
@@ -67,19 +71,33 @@ func extractSingleEmailAddress(s string) types.Email {
 
 // extract email addresses from comma separated list
 func extractMultipleEmailAddresses(s string) []types.Email {
-	log.Debug("extraction of emails ", "incoming text", s)
 	var list []types.Email
 	filter := func(c rune) bool {
 		return c == ','
 	}
 
 	for _, email := range strings.FieldsFunc(s, filter) {
-		match, err := utils.Extract(email)
+		match, err := messaging.Extract(email)
 		if err == nil {
 			list = append(list, match)
 		}
 	}
 
-	log.Debug("extracted ", "emails", list)
 	return list
+}
+
+func extractAttachments(attachments []*enmime.Part) []types.Attachment {
+	result := []types.Attachment{}
+
+	for _, attachment := range attachments {
+		if attachment.Disposition == "attachment" {
+			result = append(result, types.Attachment{
+				ContentType: attachment.ContentType,
+				FileName:    attachment.FileName,
+				Content:     attachment.Content,
+			})
+		}
+	}
+
+	return result
 }

@@ -1,4 +1,4 @@
-package utils
+package messaging
 
 import (
 	"errors"
@@ -6,9 +6,10 @@ import (
 	"strings"
 
 	"rekompose.com/engine/types"
+	"rekompose.com/engine/utils/logging"
 )
 
-var log = NewLogger()
+var log = logging.NewLogger()
 
 // Extract will extract sender information and sender email address from an email string
 func Extract(s string) (types.Email, error) {

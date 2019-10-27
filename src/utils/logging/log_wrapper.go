@@ -1,4 +1,4 @@
-package utils
+package logging
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 // NewLogger will return a standard logger with pre-customised logging configurations
 func NewLogger() *zap.SugaredLogger {
 	rawJSON := []byte(`{
-		"level": "debug",
+		"level": "info",
 		"development": true,
 		"encoding": "console",
 		"outputPaths": ["stdout", "/tmp/logs"],

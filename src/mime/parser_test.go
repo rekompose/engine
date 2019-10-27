@@ -65,7 +65,7 @@ func TestParseBase64ShouldReadFromWhenOnlyEmailAddressPresent(t *testing.T) {
 	mail := loadRawMessage("./data/mail3.json")
 
 	message, _ := ParseBase64(mail)
-	t.Error(message)
+
 	if message.From.Address == "" {
 		t.Errorf("Should parse `From` from the mime when only email address present!")
 	}
@@ -128,6 +128,27 @@ func TestParseBase64ShouldReadText(t *testing.T) {
 
 	if message.Text == "" {
 		t.Errorf("Should parse `Text` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadAttachments(t *testing.T) {
+	mail := loadRawMessage("./data/mail3.json")
+
+	message, _ := ParseBase64(mail)
+
+	if len(message.Attachments) == 0 {
+		t.Errorf("Should parse all the `attachments` from the mime!")
+	}
+}
+
+func TestParseBase64ShouldReadAttachedPDF(t *testing.T) {
+	mail := loadRawMessage("./data/mail3.json")
+
+	message, _ := ParseBase64(mail)
+	pdf := message.Attachments[0]
+
+	if !strings.HasSuffix(strings.ToLower(pdf.FileName), "pdf") {
+		t.Errorf("Should parse all the `attachments` including PDF ones from the mime!")
 	}
 }
 

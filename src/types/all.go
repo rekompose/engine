@@ -25,7 +25,6 @@ type Message struct {
 	HTML        string
 	Text        string
 	Attachments []Attachment
-	Inlines     []string
 }
 
 // Email is an proper email type as in John Doe <john@doe.org>
@@ -36,6 +35,14 @@ type Email struct {
 
 // Attachment represents the attached file of a mime part
 type Attachment struct {
+	ContentType string
+	FileName    string
+	Content     []byte
+}
+
+// Partial represents the other parts of a mime part
+type Partial struct {
+	ContentID   string
 	ContentType string
 	FileName    string
 	Content     []byte

@@ -14,7 +14,7 @@ var log = logging.NewLogger()
 // Extract will extract sender information and sender email address from an email string
 func Extract(s string) (types.Email, error) {
 	var result types.Email
-	re := regexp.MustCompile(`^(.*)?<([a-zA-Z0-9_=\.\+\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+)>$|^([a-zA-Z0-9_=\.\+\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+)$`)
+	re := regexp.MustCompile(`^(.*)?<([a-zA-Z0-9_=\.\+\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+)>.*$|^([a-zA-Z0-9_=\.\+\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+).*$`)
 
 	matches := re.FindStringSubmatch(s)
 	if matches == nil {

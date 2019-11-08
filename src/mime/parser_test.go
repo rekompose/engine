@@ -42,7 +42,7 @@ func TestParseShouldReturnErrorOnInvalidRawMessages(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadSubject(t *testing.T) {
-	mail := loadRawMessage("./data/mail1.json")
+	mail := loadRawMessage("./data/simple.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -52,7 +52,7 @@ func TestParseBase64ShouldReadSubject(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadFrom(t *testing.T) {
-	mail := loadRawMessage("./data/mail1.json")
+	mail := loadRawMessage("./data/simple.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -62,7 +62,7 @@ func TestParseBase64ShouldReadFrom(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadFromWhenOnlyEmailAddressPresent(t *testing.T) {
-	mail := loadRawMessage("./data/mail3.json")
+	mail := loadRawMessage("./data/no-sender-in-from.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -72,7 +72,7 @@ func TestParseBase64ShouldReadFromWhenOnlyEmailAddressPresent(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadTo(t *testing.T) {
-	mail := loadRawMessage("./data/mail1.json")
+	mail := loadRawMessage("./data/simple.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -82,7 +82,7 @@ func TestParseBase64ShouldReadTo(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadMultipleToAddresses(t *testing.T) {
-	mail := loadRawMessage("./data/mail2.json")
+	mail := loadRawMessage("./data/multiple-to-addresses.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -92,7 +92,7 @@ func TestParseBase64ShouldReadMultipleToAddresses(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadCc(t *testing.T) {
-	mail := loadRawMessage("./data/mail3.json")
+	mail := loadRawMessage("./data/no-sender-in-from.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -102,7 +102,7 @@ func TestParseBase64ShouldReadCc(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadMultipleCcAddresses(t *testing.T) {
-	mail := loadRawMessage("./data/mail4.json")
+	mail := loadRawMessage("./data/multiple-cc-addresses.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -112,7 +112,7 @@ func TestParseBase64ShouldReadMultipleCcAddresses(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadDate(t *testing.T) {
-	mail := loadRawMessage("./data/mail1.json")
+	mail := loadRawMessage("./data/simple.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -122,7 +122,7 @@ func TestParseBase64ShouldReadDate(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadText(t *testing.T) {
-	mail := loadRawMessage("./data/mail1.json")
+	mail := loadRawMessage("./data/simple.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -132,7 +132,7 @@ func TestParseBase64ShouldReadText(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadAttachments(t *testing.T) {
-	mail := loadRawMessage("./data/mail3.json")
+	mail := loadRawMessage("./data/no-sender-in-from.json")
 
 	message, _ := ParseBase64(mail)
 
@@ -142,13 +142,24 @@ func TestParseBase64ShouldReadAttachments(t *testing.T) {
 }
 
 func TestParseBase64ShouldReadAttachedPDF(t *testing.T) {
-	mail := loadRawMessage("./data/mail3.json")
+	mail := loadRawMessage("./data/no-sender-in-from.json")
 
 	message, _ := ParseBase64(mail)
 	pdf := message.Attachments[0]
 
 	if !strings.HasSuffix(strings.ToLower(pdf.FileName), "pdf") {
 		t.Errorf("Should parse all the `attachments` including PDF ones from the mime!")
+	}
+}
+
+func TestParseBase64ShouldEmbedImagesInHTMLContent(t *testing.T) {
+	mail := loadRawMessage("./data/embed-images-to-html.json")
+
+	message, _ := ParseBase64(mail)
+
+	if strings.Contains(message.HTML, "cid:") {
+		t.Errorf(message.HTML)
+		t.Errorf("Should embed all the images in HTML within the mime parts!")
 	}
 }
 

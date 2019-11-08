@@ -50,6 +50,17 @@ func TestExtractShouldDisplayFullEmailAddress(t *testing.T) {
 	}
 }
 
+func TestExtractShouldDisplayFullEmailAddressWhileIgnoringTheGarbage(t *testing.T) {
+	address := "John Doe <john@doe.org>"
+	test := fmt.Sprintf(address + " (something garbage)")
+
+	result, _ := Extract(test)
+
+	if result.Text() != address {
+		t.Errorf("Should display full email address from email string while ignoring garbage")
+	}
+}
+
 func TestExtractShouldDisplayFullEmailAddressWhenMissingSenderInformation(t *testing.T) {
 	address := "<john@doe.org>"
 	test := fmt.Sprintf(address)

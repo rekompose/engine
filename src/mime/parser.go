@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/jhillyerd/enmime"
@@ -33,6 +35,9 @@ func Parse(raw []byte) (types.Message, error) {
 	}
 
 	attachments := extractAttachments(env.Attachments)
+	partials := extractPartials(env.OtherParts)
+	log.Info(partials)
+	log.Info(embedPartials(env.HTML, partials))
 
 	return types.Message{
 		MimeVersion: env.GetHeader("Mime-Version"),
@@ -44,7 +49,7 @@ func Parse(raw []byte) (types.Message, error) {
 		Bcc:         extractMultipleEmailAddresses(env.GetHeader("Bcc")),
 		Subject:     env.GetHeader("Subject"),
 		Text:        env.Text,
-		HTML:        env.HTML,
+		HTML:        embedPartials(env.HTML, partials),
 		Attachments: attachments,
 	}, nil
 }
@@ -100,4 +105,29 @@ func extractAttachments(attachments []*enmime.Part) []types.Attachment {
 	}
 
 	return result
+}
+
+func extractPartials(parts []*enmime.Part) []types.Partial {
+	result := []types.Partial{}
+
+	for _, part := range parts {
+		result = append(result, types.Partial{
+			ContentID:   part.ContentID,
+			ContentType: part.ContentType,
+			FileName:    part.FileName,
+			Content:     part.Content,
+		})
+	}
+
+	return result
+}
+
+func embedPartials(html string, partials []types.Partial) string {
+	for _, partial := range partials {
+		embeddedImage := regexp.MustCompile(`cid:` + partial.ContentID + `?`)
+		content := fmt.Sprintf("data:%s;base64,%s", partial.ContentType, base64.URLEncoding.EncodeToString(partial.Content))
+		html = embeddedImage.ReplaceAllString(html, content)
+	}
+
+	return html
 }

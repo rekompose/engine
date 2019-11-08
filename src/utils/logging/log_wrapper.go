@@ -12,13 +12,11 @@ func NewLogger() *zap.SugaredLogger {
 	rawJSON := []byte(`{
 		"level": "info",
 		"development": true,
-		"encoding": "console",
-		"outputPaths": ["stdout", "/tmp/logs"],
+		"encoding": "json",
+		"outputPaths": ["/tmp/engine.log"],
 		"errorOutputPaths": ["stderr"],
 		"encoderConfig": {
 			"messageKey": "m",
-			"levelKey": "l",
-			"timeKey": "t",
 			"levelEncoder": "capitalColor"
 		}
 	}`)
